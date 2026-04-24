@@ -4,6 +4,7 @@ import http from 'http';
 import { Server } from 'socket.io';
 import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
+
 import authRoutes from './routes/auth.routes';
 import bookingRoutes from './routes/booking.routes';
 import aiRoutes from './routes/ai.routes';
@@ -18,26 +19,23 @@ dotenv.config();
 
 const app = express();
 const server = http.createServer(app);
+
+// SOCKET.IO SETUP
 export const io = new Server(server, {
   cors: {
-    origin: '*',
+    origin: '*', // allow all for now (you can restrict later)
   },
 });
 
-const allowedOrigins = process.env.FRONTEND_URL
-  ? process.env.FRONTEND_URL.split(',')
-  : ['http://localhost:3000'];
-
-app.use(cors({ origin: allowedOrigins, credentials: true }));
+// MIDDLEWARE
+app.use(cors({
+  origin: '*', // change later to your frontend URL
+  credentials: true
+}));
 app.use(express.json());
 app.use(cookieParser());
 
-// Health check / root route
-app.get('/', (_req, res) => {
-  res.json({ status: 'ok', message: 'Backend running', timestamp: new Date().toISOString() });
-});
-
-// Routes
+// ROUTES
 app.use('/api/auth', authRoutes);
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/ai', aiRoutes);
@@ -48,17 +46,24 @@ app.use('/api/ocr', ocrRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/dashboards', dashboardRoutes);
 
-// Real-time socket setup
+// ✅ ROOT ROUTE (THIS FIXES "Cannot GET /")
+app.get('/', (req, res) => {
+  res.send('🚀 Backend is running successfully');
+});
+
+// SOCKET CONNECTION
 io.on('connection', (socket) => {
   console.log('User connected:', socket.id);
-  
+
   socket.on('disconnect', () => {
     console.log('User disconnected:', socket.id);
   });
 });
 
+// PORT
 const PORT = process.env.PORT || 5000;
 
+// START SERVER
 server.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}`);
 });
