@@ -71,8 +71,8 @@ export const getPatientBookings = async (req: any, res: Response): Promise<void>
     const userId = req.user?.userId;
     const profile = await prisma.patientProfile.findUnique({ where: { userId } });
     if (!profile) {
-       res.status(404).json({ message: "Patient profile not found" });
-       return;
+      res.status(404).json({ message: "Patient profile not found" });
+      return;
     }
     const appointments = await prisma.appointment.findMany({
       where: { patientId: profile.id },
@@ -90,8 +90,8 @@ export const getDoctorBookings = async (req: any, res: Response): Promise<void> 
     const userId = req.user?.userId;
     const profile = await prisma.doctorProfile.findUnique({ where: { userId } });
     if (!profile) {
-       res.status(404).json({ message: "Doctor profile not found" });
-       return;
+      res.status(404).json({ message: "Doctor profile not found" });
+      return;
     }
     const appointments = await prisma.appointment.findMany({
       where: { doctorId: profile.id },
@@ -106,7 +106,9 @@ export const getDoctorBookings = async (req: any, res: Response): Promise<void> 
 
 export const cancelBooking = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { id } = req.params;
+    const id = Array.isArray(req.params.id)
+      ? req.params.id[0]
+      : req.params.id;
     const appointment = await prisma.appointment.update({
       where: { id },
       data: { status: 'CANCELLED' }
@@ -119,7 +121,9 @@ export const cancelBooking = async (req: Request, res: Response): Promise<void> 
 
 export const confirmBooking = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { id } = req.params;
+    const id = Array.isArray(req.params.id)
+      ? req.params.id[0]
+      : req.params.id;
     const appointment = await prisma.appointment.update({
       where: { id },
       data: { status: 'COMPLETED' } // or whatever state means confirmed/completed. Let's use COMPLETED or keep BOOKED and add confirm logic

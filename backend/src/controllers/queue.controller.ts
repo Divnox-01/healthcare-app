@@ -4,7 +4,9 @@ import { io } from '../index';
 
 export const getQueueStatus = async (req: Request, res: Response) => {
   try {
-    const { appointmentId } = req.params;
+    const appointmentId = Array.isArray(req.params.appointmentId)
+      ? req.params.appointmentId[0]
+      : req.params.appointmentId;
     const appointment = await prisma.appointment.findUnique({
       where: { id: appointmentId },
       include: { doctor: true }

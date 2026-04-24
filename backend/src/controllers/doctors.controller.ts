@@ -34,7 +34,7 @@ export const getDoctors = async (req: Request, res: Response) => {
 export const addDoctor = async (req: Request, res: Response): Promise<void> => {
   try {
     const { firstName, lastName, email, specialization, experience, fees, location } = req.body;
-    
+
     const user = await prisma.user.create({
       data: {
         email,
@@ -54,7 +54,7 @@ export const addDoctor = async (req: Request, res: Response): Promise<void> => {
         location: location || 'Remote',
       }
     });
-    
+
     res.status(201).json(doctor);
   } catch (error: any) {
     res.status(500).json({ error: error.message });
@@ -63,14 +63,16 @@ export const addDoctor = async (req: Request, res: Response): Promise<void> => {
 
 export const updateDoctor = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { id } = req.params;
+    const id = Array.isArray(req.params.id)
+      ? req.params.id[0]
+      : req.params.id;
     const { firstName, lastName, specialization, experience, fees, location } = req.body;
-    
+
     const doctor = await prisma.doctorProfile.update({
       where: { id },
       data: { firstName, lastName, specialization, experience: Number(experience), fees: Number(fees), location }
     });
-    
+
     res.status(200).json(doctor);
   } catch (error: any) {
     res.status(500).json({ error: error.message });
@@ -79,7 +81,9 @@ export const updateDoctor = async (req: Request, res: Response): Promise<void> =
 
 export const deleteDoctor = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { id } = req.params;
+    const id = Array.isArray(req.params.id)
+      ? req.params.id[0]
+      : req.params.id;
     const doctor = await prisma.doctorProfile.findUnique({ where: { id } });
     if (!doctor) {
       res.status(404).json({ message: "Doctor not found" });

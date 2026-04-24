@@ -1,0 +1,10 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const dashboard_controller_1 = require("../controllers/dashboard.controller");
+const auth_middleware_1 = require("../middleware/auth.middleware");
+const router = (0, express_1.Router)();
+router.get('/patient', auth_middleware_1.authenticateUser, (0, auth_middleware_1.requireRole)(['PATIENT']), dashboard_controller_1.getPatientDashboard);
+router.get('/doctor', auth_middleware_1.authenticateUser, (0, auth_middleware_1.requireRole)(['DOCTOR']), dashboard_controller_1.getDoctorDashboard);
+router.get('/admin', auth_middleware_1.authenticateUser, (0, auth_middleware_1.requireRole)(['ADMIN']), dashboard_controller_1.getAdminDashboard);
+exports.default = router;
