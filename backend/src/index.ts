@@ -32,6 +32,11 @@ app.use(cors({ origin: allowedOrigins, credentials: true }));
 app.use(express.json());
 app.use(cookieParser());
 
+// Health check / root route
+app.get('/', (_req, res) => {
+  res.json({ status: 'ok', message: 'Backend running', timestamp: new Date().toISOString() });
+});
+
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/bookings', bookingRoutes);
