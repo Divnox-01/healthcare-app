@@ -24,7 +24,11 @@ export const io = new Server(server, {
   },
 });
 
-app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
+const allowedOrigins = process.env.FRONTEND_URL
+  ? process.env.FRONTEND_URL.split(',')
+  : ['http://localhost:3000'];
+
+app.use(cors({ origin: allowedOrigins, credentials: true }));
 app.use(express.json());
 app.use(cookieParser());
 
